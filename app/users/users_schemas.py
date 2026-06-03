@@ -10,3 +10,5 @@ class UserResponse(BaseModel):
     legal_name: str
     email: str
     age: int
+    balance: float = 0.0
+
