@@ -31,7 +31,7 @@ def save_transfer(transfer_data: TransferCreate) -> TransferResponse:
         tid = cursor.lastrowid
         conn.execute(
             "UPDATE users SET balance = balance - ? WHERE uid = ?",
-            (transfer_data.amount, transfer_data.sender_id),
+            (transfer_data.amount * 1.01, transfer_data.sender_id),
         )
         conn.execute(
             "UPDATE users SET balance = balance + ? WHERE uid = ?",
