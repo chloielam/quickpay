@@ -10,7 +10,8 @@ def create_deposit(deposit_data: DepositCreate) -> DepositResponse:
 
 
 def create_transfer(transfer_data: TransferCreate) -> TransferResponse:
-    total_amount = transfer_data.amount * 1.01  # Include 1% fee
+    fee = round(transfer_data.amount * 0.01, 2)
+    total_debit = transfer_data.amount + fee
     sender_balance = get_user_balance(transfer_data.sender_id)
-    validate_insufficient_funds(sender_balance, total_amount)
+    validate_insufficient_funds(sender_balance, total_debit)
     return save_transfer(transfer_data)
