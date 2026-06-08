@@ -2,6 +2,22 @@
 
 **Overview:** This QuickPay is a FastAPI application for micro-payments services (create users, make deposits, make transfers).
 
+## Design Overview
+The systems is organized into feature-based modules, with user managagement and transaction management.
+
+The implementation separates into following layers: 
+- **API layer**: defines FastAPI endpoints and handles HTTP requests and response
+- **Validation layer**: validates the user inputs based on system requirements
+- **Service layer**: the core business logic
+- **Repository layer**: handles data CRUD by sqlite
+- **Schema layer**: defines request and response data models with Pydantic
+
+## Database schema
+For the database schema, I have 3 main tables, you can see more details in `app/storage/repository.py`. I use auto increment to assign all types of ids: 
+- `users` table: `uid` as key, `legal_name`, `email`, `age`, `balance`
+- `deposits` table: `tid` as prikey, `amount`, `user_id`, `timestamp`
+- `transfers` table: `tid` as primary key, `amount`, `sender_id`, `receiver_id`, `timestamp`
+
 ## Setup
 
 1. Make sure Python is available in your environment, then install requirements:
