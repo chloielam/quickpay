@@ -36,3 +36,11 @@ def get_user_balance(user_id: int) -> float:
         cursor.execute("SELECT balance FROM users WHERE uid = ?", (user_id,))
         row = cursor.fetchone()
         return float(row[0]) if row else 0.0
+
+
+def list_users() -> list[UserResponse]:
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT uid, legal_name, email, age, balance FROM users ORDER BY uid")
+        rows = cursor.fetchall()
+        return [UserResponse(uid=r[0], legal_name=r[1], email=r[2], age=r[3], balance=r[4]) for r in rows]

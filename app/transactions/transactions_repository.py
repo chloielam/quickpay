@@ -41,3 +41,19 @@ def save_transfer(transfer_data: TransferCreate) -> TransferResponse:
         )
         conn.commit()
         return TransferResponse(tid=tid, amount=transfer_data.amount, sender_id=transfer_data.sender_id, receiver_id=transfer_data.receiver_id, timestamp=timestamp)
+
+
+def list_deposits() -> list[DepositResponse]:
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT tid, amount, user_id, timestamp FROM deposits ORDER BY tid")
+        rows = cursor.fetchall()
+        return [DepositResponse(tid=r[0], amount=r[1], user_id=r[2], timestamp=r[3]) for r in rows]
+
+
+def list_transfers() -> list[TransferResponse]:
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT tid, amount, sender_id, receiver_id, timestamp FROM transfers ORDER BY tid")
+        rows = cursor.fetchall()
+        return [TransferResponse(tid=r[0], amount=r[1], sender_id=r[2], receiver_id=r[3], timestamp=r[4]) for r in rows]

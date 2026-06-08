@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 
 from .transactions_services import create_deposit, create_transfer
 from .transactions_schemas import DepositCreate, DepositResponse, TransferCreate, TransferResponse
+from app.transactions.transactions_repository import list_deposits, list_transfers
 from app.core.errors import ERR_DEPOSIT_LIMIT, ERR_INSUFFICIENT_FUNDS
 
 router = APIRouter(prefix="/transactions", tags=["transactions"])
@@ -28,3 +29,13 @@ def create_new_transfer(transfer_data: TransferCreate) -> TransferResponse:
         if msg == ERR_DEPOSIT_LIMIT:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=msg)
+
+
+@router.get("/deposits", response_model=list[DepositResponse])
+def get_deposits():
+    return list_deposits()
+
+
+@router.get("/transfers", response_model=list[TransferResponse])
+def get_transfers():
+    return list_transfers()

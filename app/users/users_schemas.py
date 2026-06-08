@@ -12,3 +12,7 @@ class UserResponse(BaseModel):
     age: int
     balance: float = 0.0
 
+class UserBalanceResponse(BaseModel):
+    uid: int
+    balance: float
+
