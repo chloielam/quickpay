@@ -1,6 +1,7 @@
 from pydantic import BaseModel 
 
 class UserCreate(BaseModel):
+    user_id: int
     legal_name: str
     email: str
     age: int
@@ -15,4 +16,3 @@ class UserResponse(BaseModel):
 class UserBalanceResponse(BaseModel):
     uid: int
     balance: float
-

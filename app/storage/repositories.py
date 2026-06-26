@@ -4,7 +4,9 @@ from pathlib import Path
 DATABASE_PATH = Path(__file__).resolve().parents[2] / "quickpay.db"
 
 def get_connection():
-    return sqlite3.connect(DATABASE_PATH)
+    conn = sqlite3.connect(DATABASE_PATH)
+    conn.execute("PRAGMA foreign_keys = ON")
+    return conn
 
 
 def init_db():
@@ -47,5 +49,4 @@ def init_db():
             """
         )
         conn.commit()
-
 

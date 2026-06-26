@@ -13,7 +13,7 @@ The implementation separates into following layers:
 - **Schema layer**: defines request and response data models with Pydantic
 
 ## Database schema
-For the database schema, I have 3 main tables, you can see more details in `app/storage/repository.py`. I use auto increment to assign all types of ids: 
+For the database schema, I have 3 main tables, you can see more details in `app/storage/repository.py`. Transaction ids are auto incremented, while user ids are supplied by the client and stored as the primary key:
 - `users` table: `uid` as key, `legal_name`, `email`, `age`, `balance`
 - `deposits` table: `tid` as prikey, `amount`, `user_id`, `timestamp`
 - `transfers` table: `tid` as primary key, `amount`, `sender_id`, `receiver_id`, `timestamp`
@@ -47,7 +47,7 @@ Request:
 ```bash
 curl -s -X POST http://127.0.0.1:8000/users/create \
     -H "Content-Type: application/json" \
-    -d '{"legal_name":"Gia Lam","email":"gtlam@mun.ca","age":24}'
+    -d '{"user_id":1,"legal_name":"Gia Lam","email":"gtlam@mun.ca","age":24}'
 ```
 
 Expected: HTTP `201` with JSON including `uid`, `legal_name`, `email`, `age`, and `balance` (0.0).
@@ -62,6 +62,12 @@ If the email is invalid, the response is HTTP `400` with JSON:
 
 ```json
 { "detail": "ERR_INVALID_EMAIL" }
+```
+
+If the `user_id` already exists, the response is HTTP `400` with JSON:
+
+```json
+{ "detail": "ERR_DUPLICATE_USER_ID" }
 ```
 
 ### Deposit
@@ -86,6 +92,12 @@ If the deposit amount is < 5 or > 5000, the response is HTTP `400` with JSON:
 { "detail": "ERR_DEPOSIT_LIMIT" }
 ```
 
+If the `user_id` does not exist, the response is HTTP `404` with JSON:
+
+```json
+{ "detail": "ERR_USER_NOT_FOUND" }
+```
+
 ### Transfer
 
 `POST /transactions/transfer`
@@ -108,6 +120,18 @@ If the sender balance is insufficient, the response is HTTP `400` with JSON:
 
 ```json
 { "detail": "ERR_INSUFFICIENT_FUNDS" }
+```
+
+If either user does not exist, the response is HTTP `404` with JSON:
+
+```json
+{ "detail": "ERR_USER_NOT_FOUND" }
+```
+
+If `amount` is `<= 0`, the response is HTTP `400` with JSON:
+
+```json
+{ "detail": "ERR_INVALID_TRANSFER_AMOUNT" }
 ```
 
 ## Supporting endpoints
@@ -159,4 +183,3 @@ curl -s http://127.0.0.1:8000/transactions/transfers
 ```
 
 Expected: HTTP `200` with a JSON array of transfer records.
-
