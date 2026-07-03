@@ -1,7 +1,16 @@
+import os
 import sqlite3
 from pathlib import Path
 
-DATABASE_PATH = Path(__file__).resolve().parents[2] / "quickpay.db"
+
+def get_database_path() -> Path:
+    env_path = os.getenv("QUICKPAY_DB_PATH")
+    if env_path:
+        return Path(env_path)
+    return Path(__file__).resolve().parents[2] / "quickpay.db"
+
+
+DATABASE_PATH = get_database_path()
 
 def get_connection():
     conn = sqlite3.connect(DATABASE_PATH)
@@ -49,4 +58,3 @@ def init_db():
             """
         )
         conn.commit()
-
