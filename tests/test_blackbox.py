@@ -105,3 +105,57 @@ class QuickPayBlackBoxTests(unittest.TestCase):
             }
         except URLError as exc:
             raise RuntimeError(f"Request failed: {exc}") from exc
+    
+    @classmethod
+    def next_user_payload(cls, *, age: int, email: str) -> dict:
+        payload = {
+            "user_id": cls.user_id_counter,
+            "legal_name": f"User {cls.user_id_counter}",
+            "email": email,
+            "age": age,
+        }
+        cls.user_id_counter += 1
+        return payload
+    
+    @classmethod
+    def create_valid_user(cls) -> dict:
+        payload = cls.next_user_payload(
+            age=25,
+            email=f"user{cls.user_id_counter}@example.com",
+        )
+        response = cls.request("POST", "/users/create", payload)
+        if response["status"] != 201:
+            raise AssertionError(f"Failed to create setup user: {response}")
+        return response["json"]
+
+    ##### For SR 1.2
+
+    ## age=17
+    def test_01(self) -> None:
+        response = self.request(
+            "POST",
+            "/users/create",
+            self.next_user_payload(age=17, email="tc01@example.com"),
+        )
+        self.assertEqual(response["status"], 400)
+        self.assertEqual(response["json"], {"detail": "ERR_AGE_RESTRICTED"})
+
+    ## age=18
+    def test_02(self) -> None:
+        response = self.request(
+            "POST",
+            "/users/create",
+            self.next_user_payload(age=18, email="tc02@example.com"),
+        )
+        self.assertEqual(response["status"], 201)
+        self.assertEqual(response["json"]["age"], 18)
+
+    ## age=19
+    def test_03(self) -> None:
+        response = self.request(
+            "POST",
+            "/users/create",
+            self.next_user_payload(age=19, email="tc03@example.com"),
+        )
+        self.assertEqual(response["status"], 201)
+        self.assertEqual(response["json"]["age"], 19)
