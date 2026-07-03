@@ -130,7 +130,7 @@ class QuickPayBlackBoxTests(unittest.TestCase):
 
     ##### For SR 1.2
 
-    ## age=17
+    ## age 17
     def test_01(self) -> None:
         response = self.request(
             "POST",
@@ -140,7 +140,7 @@ class QuickPayBlackBoxTests(unittest.TestCase):
         self.assertEqual(response["status"], 400)
         self.assertEqual(response["json"], {"detail": "ERR_AGE_RESTRICTED"})
 
-    ## age=18
+    ## age 18
     def test_02(self) -> None:
         response = self.request(
             "POST",
@@ -150,7 +150,7 @@ class QuickPayBlackBoxTests(unittest.TestCase):
         self.assertEqual(response["status"], 201)
         self.assertEqual(response["json"]["age"], 18)
 
-    ## age=19
+    ## age 19
     def test_03(self) -> None:
         response = self.request(
             "POST",
@@ -159,3 +159,125 @@ class QuickPayBlackBoxTests(unittest.TestCase):
         )
         self.assertEqual(response["status"], 201)
         self.assertEqual(response["json"]["age"], 19)
+
+    ##### For SR 1.3
+    ## valid email
+    def test_04(self) -> None:
+        response = self.request(
+            "POST",
+            "/users/create",
+            self.next_user_payload(age=24, email="gtlam@mun.ca"),
+        )
+        self.assertEqual(response["status"], 201)
+        self.assertEqual(response["json"]["email"], "gtlam@mun.ca")
+
+    ## double @
+    def test_05(self) -> None:
+        response = self.request(
+            "POST",
+            "/users/create",
+            self.next_user_payload(age=24, email="gtlam@@mun.ca"),
+        )
+        self.assertEqual(response["status"], 400)
+        self.assertEqual(response["json"], {"detail": "ERR_INVALID_EMAIL"})
+
+    ## no . after @
+    def test_06(self) -> None:
+        response = self.request(
+            "POST",
+            "/users/create",
+            self.next_user_payload(age=24, email="gtlam@munca"),
+        )
+        self.assertEqual(response["status"], 400)
+        self.assertEqual(response["json"], {"detail": "ERR_INVALID_EMAIL"})
+
+    ## missing @
+    def test_07(self) -> None:
+        response = self.request(
+            "POST",
+            "/users/create",
+            self.next_user_payload(age=24, email="gtlammun.ca"),
+        )
+        self.assertEqual(response["status"], 400)
+        self.assertEqual(response["json"], {"detail": "ERR_INVALID_EMAIL"})
+    
+    ## . before @ only 
+    def test_08(self) -> None:
+        response = self.request(
+            "POST",
+            "/users/create",
+            self.next_user_payload(age=24, email="gtlam.mun@ca"),
+        )
+        self.assertEqual(response["status"], 400)
+        self.assertEqual(response["json"], {"detail": "ERR_INVALID_EMAIL"})
+
+    #### For SR 2.1
+
+    ## deposit 4.99
+    def test_09(self) -> None:
+        user = self.create_valid_user()
+        response = self.request(
+            "POST",
+            "/transactions/deposit",
+            {"amount": 4.99, "user_id": user["uid"]},
+        )
+        self.assertEqual(response["status"], 400)
+        self.assertEqual(response["json"], {"detail": "ERR_DEPOSIT_LIMIT"})
+
+    ## deposit 5.00
+    def test_10(self) -> None:
+        user = self.create_valid_user()
+        response = self.request(
+            "POST",
+            "/transactions/deposit",
+            {"amount": 5.00, "user_id": user["uid"]},
+        )
+        self.assertEqual(response["status"], 201)
+        self.assertEqual(response["json"]["amount"], 5.0)
+
+    ## deposit 5.01
+    def test_11(self) -> None:
+        user = self.create_valid_user()
+        response = self.request(
+            "POST",
+            "/transactions/deposit",
+            {"amount": 5.01, "user_id": user["uid"]},
+        )
+        self.assertEqual(response["status"], 201)
+        self.assertEqual(response["json"]["amount"], 5.01)
+
+    ## deposit 4999.99
+    def test_12(self) -> None:
+        user = self.create_valid_user()
+        response = self.request(
+            "POST",
+            "/transactions/deposit",
+            {"amount": 4999.99, "user_id": user["uid"]},
+        )
+        self.assertEqual(response["status"], 201)
+        self.assertEqual(response["json"]["amount"], 4999.99)
+
+    ## deposit 5000.00
+    def test_13(self) -> None:
+        user = self.create_valid_user()
+        response = self.request(
+            "POST",
+            "/transactions/deposit",
+            {"amount": 5000.00, "user_id": user["uid"]},
+        )
+        self.assertEqual(response["status"], 201)
+        self.assertEqual(response["json"]["amount"], 5000.0)
+
+    ## deposit 5000.01
+    def test_14(self) -> None:
+        user = self.create_valid_user()
+        response = self.request(
+            "POST",
+            "/transactions/deposit",
+            {"amount": 5000.01, "user_id": user["uid"]},
+        )
+        self.assertEqual(response["status"], 400)
+        self.assertEqual(response["json"], {"detail": "ERR_DEPOSIT_LIMIT"})
+
+
+    
