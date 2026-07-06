@@ -17,7 +17,7 @@ def get_all_users() -> list[UserResponse]:
     return list_users()
 
 
-def get_user_balance_info(user_id: int) -> UserBalanceResponse:
+def get_user_balance_info(user_id: str) -> UserBalanceResponse:
     user = get_user_by_id(user_id)
     if not user:
         raise ValueError(ERR_USER_NOT_FOUND)

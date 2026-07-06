@@ -15,7 +15,7 @@ def test_get_users_returns_created_users(client: TestClient, create_api_user) ->
 
 
 def test_get_user_balance_returns_404_for_missing_user(client: TestClient) -> None:
-    response = client.get("/users/9999/balance")
+    response = client.get("/users/missing-user/balance")
 
     assert response.status_code == 404
     assert response.json() == {"detail": "ERR_USER_NOT_FOUND"}
@@ -44,7 +44,7 @@ def test_user_create_route_returns_generic_400_for_unknown_value_error(client: T
 
     response = client.post(
         "/users/create",
-        json={"user_id": 9991, "legal_name": "Route User", "email": "route@example.com", "age": 24},
+        json={"user_id": "user-9991", "legal_name": "Gia Lam", "email": "gtlam@mun.ca", "age": 24},
     )
 
     assert response.status_code == 400
@@ -57,11 +57,19 @@ def test_user_balance_route_returns_generic_400_for_unknown_value_error(client: 
 
     monkeypatch.setattr(users_routes, "get_user_balance_info", fake_get_user_balance_info)
 
-    response = client.get("/users/1000/balance")
+    response = client.get("/users/user-1000/balance")
 
     assert response.status_code == 400
     assert response.json() == {"detail": "UNEXPECTED_BALANCE_ERROR"}
 
+def test_user_create_route_returns_400_for_age_restriction(client: TestClient) -> None:
+    response = client.post(
+        "/users/create",
+        json={"user_id": "user-9001", "legal_name": "Gia Lam", "email": "gtlam@mun.ca", "age": 17},
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {"detail": "ERR_AGE_RESTRICTED"}
 
 
 

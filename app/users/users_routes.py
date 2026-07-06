@@ -24,7 +24,7 @@ def get_users():
 
 
 @router.get("/{user_id}/balance", response_model=UserBalanceResponse)
-def get_user_balance_endpoint(user_id: int):
+def get_user_balance_endpoint(user_id: str):
     try:
         return get_user_balance_info(user_id)
     except ValueError as e:

@@ -19,7 +19,7 @@ def save_user(user_data: UserCreate) -> UserResponse:
             balance=0.0,
         )
 
-def get_user_by_id(uid: int) -> Optional[UserResponse]:
+def get_user_by_id(uid: str) -> Optional[UserResponse]:
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT uid, legal_name, email, age, balance FROM users WHERE uid = ?", (uid,))
@@ -35,7 +35,7 @@ def get_user_by_email(email: str) -> Optional[UserResponse]:
         return UserResponse(uid=row[0], legal_name=row[1], email=row[2], age=row[3], balance=row[4]) if row else None
 
 
-def get_user_balance(user_id: int) -> Optional[float]:
+def get_user_balance(user_id: str) -> Optional[float]:
     with get_connection() as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT balance FROM users WHERE uid = ?", (user_id,))

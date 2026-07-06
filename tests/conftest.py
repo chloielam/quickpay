@@ -35,7 +35,7 @@ def client(db_path: Path) -> TestClient:
 @pytest.fixture
 def create_user_payload(user_id_sequence: count):
     def _create_payload(*, age: int = 25, email: str | None = None, legal_name: str | None = None) -> dict:
-        user_id = next(user_id_sequence)
+        user_id = f"user-{next(user_id_sequence)}"
         return {
             "user_id": user_id,
             "legal_name": legal_name or f"User {user_id}",
@@ -68,7 +68,7 @@ def create_service_user(db_path: Path, create_user_payload):
 
 @pytest.fixture
 def seed_balance(db_path: Path):
-    def _seed_balance(*, user_id: int, amount: float) -> None:
+    def _seed_balance(*, user_id: str, amount: float) -> None:
         create_deposit(DepositCreate(amount=amount, user_id=user_id))
 
     return _seed_balance

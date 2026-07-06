@@ -13,7 +13,7 @@ The implementation separates into following layers:
 - **Schema layer**: defines request and response data models with Pydantic
 
 ## Database schema
-For the database schema, I have 3 main tables, you can see more details in `app/storage/repository.py`. Transaction ids are auto incremented, while user ids are supplied by the client and stored as the primary key:
+For the database schema, I have 3 main tables, you can see more details in `app/storage/repository.py`. Transaction ids are auto incremented, while user ids are supplied by the client as unique strings and stored as the primary key:
 - `users` table: `uid` as key, `legal_name`, `email`, `age`, `balance`
 - `deposits` table: `tid` as prikey, `amount`, `user_id`, `timestamp`
 - `transfers` table: `tid` as primary key, `amount`, `sender_id`, `receiver_id`, `timestamp`
@@ -47,7 +47,7 @@ Request:
 ```bash
 curl -s -X POST http://127.0.0.1:8000/users/create \
     -H "Content-Type: application/json" \
-    -d '{"user_id":1,"legal_name":"Gia Lam","email":"gtlam@mun.ca","age":24}'
+    -d '{"user_id":"user-1","legal_name":"Gia Lam","email":"gtlam@mun.ca","age":24}'
 ```
 
 Expected: HTTP `201` with JSON including `uid`, `legal_name`, `email`, `age`, and `balance` (0.0).
@@ -74,14 +74,14 @@ If the `user_id` already exists, the response is HTTP `400` with JSON:
 
 `POST /transactions/deposit`
 
-First, make sure at least one user exists and you know their `uid`. In the sample below, I assume the `uid` is `1`.
+First, make sure at least one user exists and you know their `uid`. In the sample below, I assume the `uid` is `"user-1"`.
 
 Request:
 
 ```bash
 curl -s -X POST http://127.0.0.1:8000/transactions/deposit \
     -H "Content-Type: application/json" \
-    -d '{"amount":100.0,"user_id":1}' -i
+    -d '{"amount":100.0,"user_id":"user-1"}' -i
 ```
 
 Expected: HTTP `201` and JSON with `tid`, `amount`, `user_id`, and `timestamp`. The user's `balance` increases by `100.0`.
@@ -102,14 +102,14 @@ If the `user_id` does not exist, the response is HTTP `404` with JSON:
 
 `POST /transactions/transfer`
 
-Make sure at least two users exist and you know both `uid`. In the sample below, I assume sender's is `1` and receiver's is `2`.
+Make sure at least two users exist and you know both `uid`. In the sample below, I assume sender's is `"user-1"` and receiver's is `"user-2"`.
 
 Request:
 
 ```bash
 curl -s -X POST http://127.0.0.1:8000/transactions/transfer \
     -H "Content-Type: application/json" \
-    -d '{"amount":50.0,"sender_id":1,"receiver_id":2}' -i
+    -d '{"amount":50.0,"sender_id":"user-1","receiver_id":"user-2"}' -i
 ```
 
 Expected: HTTP `201` and JSON with `tid`, `amount`, `sender_id`, `receiver_id`, and `timestamp`.
@@ -155,7 +155,7 @@ Expected: HTTP `200` with a JSON array of users.
 Request:
 
 ```bash
-curl -s http://127.0.0.1:8000/users/1/balance
+curl -s http://127.0.0.1:8000/users/user-1/balance
 ```
 
 Expected: HTTP `200` with JSON including `uid` and `balance`.

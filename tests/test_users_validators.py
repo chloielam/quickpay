@@ -13,10 +13,10 @@ def test_validate_age_accepts_18() -> None:
 
 
 def test_validate_email_accepts_valid_email() -> None:
-    assert validate_email("user@example.com") is True
+    assert validate_email("gtlam@hcmut.edu.vn") is True
 
 
-@pytest.mark.parametrize("email", ["usertest.com", "user@@test.com", "user@testcom"])
+@pytest.mark.parametrize("email", ["gtlam.com", "gtlam@@mun.ca", "gtlam@munca"])
 def test_validate_email_rejects_invalid_inputs(email: str) -> None:
     with pytest.raises(ValueError, match="ERR_INVALID_EMAIL"):
         validate_email(email)

@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from app.transactions import transactions_routes
 
 def test_deposit_route_returns_404_for_missing_user(client: TestClient) -> None:
-    response = client.post("/transactions/deposit", json={"amount": 100.0, "user_id": 9999})
+    response = client.post("/transactions/deposit", json={"amount": 100.0, "user_id": "missing-user"})
 
     assert response.status_code == 404
     assert response.json() == {"detail": "ERR_USER_NOT_FOUND"}
@@ -29,7 +29,7 @@ def test_transfer_route_returns_404_for_missing_user(client: TestClient, create_
 
     response = client.post(
         "/transactions/transfer", 
-        json={"amount": 10.0, "sender_id": sender["uid"], "receiver_id": 9999},
+        json={"amount": 10.0, "sender_id": sender["uid"], "receiver_id": "missing-user"},
     )
 
     assert response.status_code == 404
@@ -81,7 +81,7 @@ def test_deposit_route_returns_generic_400_for_unknown_value_error(client: TestC
 
     monkeypatch.setattr(transactions_routes, "create_deposit", fake_create_deposit)
 
-    response = client.post("/transactions/deposit", json={"amount": 100.0, "user_id": 1000})
+    response = client.post("/transactions/deposit", json={"amount": 100.0, "user_id": "user-1000"})
 
     assert response.status_code == 400
     assert response.json() == {"detail": "UNEXPECTED_DEPOSIT_ERROR"}
@@ -95,8 +95,15 @@ def test_transfer_route_returns_generic_400_for_unknown_value_error(client: Test
 
     response = client.post(
         "/transactions/transfer",
-        json={"amount": 10.0, "sender_id": 1000, "receiver_id": 1001},
+        json={"amount": 10.0, "sender_id": "user-1000", "receiver_id": "user-1001"},
     )
 
     assert response.status_code == 400
     assert response.json() == {"detail": "UNEXPECTED_TRANSFER_ERROR"}
+
+def test_deposit_route_returns_400_for_deposit_limit(client: TestClient, create_api_user) -> None:
+    user = create_api_user()
+    response = client.post("/transactions/deposit", json={"amount": 4.99, "user_id": user["uid"]})
+
+    assert response.status_code == 400
+    assert response.json() == {"detail": "ERR_DEPOSIT_LIMIT"}
