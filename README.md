@@ -201,8 +201,7 @@ python -m pytest -q
 
 To run the test while collecting line and branch coverage:
 ```bash
-python -m coverage run 
---branch -m pytest -q
+python -m coverage run --branch -m pytest -q
 ```
 
 To get the coverage summary and missing lines: 
