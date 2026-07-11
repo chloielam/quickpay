@@ -184,6 +184,94 @@ curl -s http://127.0.0.1:8000/transactions/transfers
 
 Expected: HTTP `200` with a JSON array of transfer records.
 
+## Black box testing
+
+### TC-01 — SR 1.2
+```bash
+curl -i -X POST http://127.0.0.1:8000/users/create \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"U001","legal_name":"Gia Lam","email":"gtlam@mun.ca","age":17}'
+```
+
+### TC-02 — SR 1.2
+```bash
+curl -i -X POST http://127.0.0.1:8000/users/create \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"U002","legal_name":"Gia Lam","email":"gtlam@mun.ca","age":18}'
+```
+
+### TC-03 — SR 1.2
+```bash
+curl -i -X POST http://127.0.0.1:8000/users/create \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"U003","legal_name":"Gia Lam","email":"gtlam@mun.ca","age":19}'
+```
+
+### TC-04 — SR 1.3
+```bash
+curl -i -X POST http://127.0.0.1:8000/users/create \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"U004","legal_name":"Gia Lam","email":"gtlam@mun.ca","age":24}'
+```
+
+### TC-05 — SR 1.3
+```bash
+curl -i -X POST http://127.0.0.1:8000/users/create \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"U005","legal_name":"Gia Lam","email":"gtlammun.ca","age":24}'
+```
+
+### TC-06 — SR 1.3
+```bash
+curl -i -X POST http://127.0.0.1:8000/users/create \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"U006","legal_name":"Gia Lam","email":"gt-lam@@mun.ca","age":24}'
+```
+### TC-07 — SR 1.3
+```bash
+curl -i -X POST http://127.0.0.1:8000/users/create \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"U007","legal_name":"Gia Lam","email":"gtlam@munca","age":24}'
+```
+### TC-08 — SR 2.1
+```bash
+curl -i -X POST http://127.0.0.1:8000/transactions/deposit \
+  -H "Content-Type: application/json" \
+  -d '{"amount":4.99,"user_id":"U002"}'
+```
+### TC-09 — SR 2.1
+```bash
+curl -i -X POST http://127.0.0.1:8000/transactions/deposit \
+  -H "Content-Type: application/json" \
+  -d '{"amount":5.00,"user_id":"U002"}'
+```
+### TC-10 — SR 2.1
+```bash
+curl -i -X POST http://127.0.0.1:8000/transactions/deposit \
+  -H "Content-Type: application/json" \
+  -d '{"amount":5.01,"user_id":"U002"}'
+```
+### TC-11 — SR 2.1
+```bash
+curl -i -X POST http://127.0.0.1:8000/transactions/deposit \
+  -H "Content-Type: application/json" \
+  -d '{"amount":4999.99,"user_id":"U002"}'
+```
+
+### TC-12 — SR 2.1
+```bash
+curl -i -X POST http://127.0.0.1:8000/transactions/deposit \
+  -H "Content-Type: application/json" \
+  -d '{"amount":5000.00,"user_id":"U002"}'
+```
+
+### TC-13 — SR 2.1
+```bash
+curl -i -X POST http://127.0.0.1:8000/transactions/deposit \
+  -H "Content-Type: application/json" \
+  -d '{"amount":5000.01,"user_id":"U002"}'
+```
+
 ## White box testing
 The project uses `pytest` for automated testing `Coverage.py` for statement and branch coverage. 
 All testing files are placed in tests folder. Tests are divided into 3 layers: routes, services, and validators of 2 modules including users and transactions. 
