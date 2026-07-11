@@ -183,3 +183,31 @@ curl -s http://127.0.0.1:8000/transactions/transfers
 ```
 
 Expected: HTTP `200` with a JSON array of transfer records.
+
+## White box testing
+The project uses `pytest` for automated testing `Coverage.py` for statement and branch coverage. 
+All testing files are placed in tests folder. Tests are divided into 3 layers: routes, services, and validators of 2 modules including users and transactions. 
+
+* Validator test call validation functions directly and check both valid and invalid inputs
+* Service tests call business-logic functions directly and verify balance updates, duplicate detection, missing-user handling, and transfer fee behavior
+* Route tests use FastAPI `TestClient` to send in-process HTTP requests to the API and verify status codes and JSON responses
+
+All of them shared fixtures in `conftest.py` which isolate each test case. Each test have a fresh temporary SQLite DB so test data does not lead between tests. Helper fixtures also generate valid users and seed balances. 
+
+To run all the tests: 
+```bash
+python -m pytest -q
+```
+
+To run the test while collecting line and branch coverage:
+```bash
+python -m coverage run 
+--branch -m pytest -q
+```
+
+To get the coverage summary and missing lines: 
+```bash
+python -m coverage report -m
+```
+
+
